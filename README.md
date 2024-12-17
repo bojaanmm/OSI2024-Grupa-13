@@ -24,7 +24,7 @@ b)Program za plaćanje parkinga
   nalazi, dana (radni dan, vikend, praznik). Za plaćanje se može koristiti gotovina ili
   kartica, a naplatu simulirati samo unosom podataka bez dodatne obrade. Nakon
   plaćanja korisnik dobija karticu u tekstualnom fajlu koja se koristi prilikom
-  odobravanja izlaska sa parkinga.
+  odobravanja izlaska sa parkingac).
   
 c)Program za upravljanje parkingom
   Ovaj program koriste operateri i uprava. Uprava može dobiti izvještaje o radu
@@ -34,5 +34,6 @@ c)Program za upravljanje parkingom
   provjeriti ko je platio parking i rješavati konfliktne situacije (žalbe na račune, probleme
   sa ulaskom ili izlaskom). Žalbe podnose korisnici u programu za plaćanje parkinga
   (unos teksta), a svaka žalba ima status aktivna i riješena.
-  Sve navedene opcije je potrebno dodatno analizirati, precizno definisati i po potrebi proširiti.
-  --------------------------------------------------------------
+  Sve navedene opcije je potrebno dodatno analizirati, precizno definisati i po potrebi proširiti..
+  
+--------------------------------------------------------------
