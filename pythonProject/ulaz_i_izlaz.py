@@ -69,15 +69,33 @@ def handle_input():
         data["occupied_spots"] += 1
         save_parking_data(data)
 
+        # Dodavanje novog vozila u parking_data.json
+        try:
+            with open("parking_data.json", "r") as json_file:
+                parked_vehicles = json.load(json_file)
+        except (FileNotFoundError, json.JSONDecodeError):
+            parked_vehicles = []
+
+        # Dodavanje nove evidencije u listu
+        parked_vehicles.append(parking_record)
+
+        # Spremanje ažurirane liste u fajl
+        with open("parking_data.json", "w") as json_file:
+            json.dump(parked_vehicles, json_file, indent=4)
+
         # Kreiranje .txt fajla sa informacijama
         with open(f"parking_ticket_{unique_code}.txt", "w") as txt_file:
             txt_file.write(f"Registarska oznaka: {reg_oznaka}\n")
             txt_file.write(f"Vrijeme: {current_time}\n")
             txt_file.write(f"Jedinstveni kod: {unique_code}\n")
 
+        # Prikaz poruke o uspjehu
+        messagebox.showinfo("Uspjeh", f"Unos registarskih oznaka '{reg_oznaka}' je uspješno zabilježen!")
+
         print(f"Unesena registarska oznaka: {reg_oznaka}, Vrijeme: {current_time}, Kod: {unique_code}")
         update_free_spots()
         entry.delete(0, tk.END)
+
 
 # Dodavanje labela za unos registarskih oznaka
 label = tk.Label(root, text="Unesite registarsku oznaku:", bg="#A9CFE8")
