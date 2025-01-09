@@ -116,6 +116,12 @@ root = tk.Tk()
 root.title("Upravljanje parkingom")
 root.geometry("600x500")
 
+# Postavljanje ikone prozora
+root.iconphoto(False, tk.PhotoImage(file="parking.png"))
+
+# Promjena boje pozadine prozora na neutralno plavu
+root.config(bg="#A9CFE8")
+
 # Frame za unos broja parking mjesta
 frame_parking_spots = tk.Frame(root)
 frame_parking_spots.pack(pady=10)
