@@ -28,7 +28,8 @@ def update_parking_administration():
         json.dump(parking_administration, f, indent=4)
 
 # Funkcija za izračunavanje vremena parkiranja i cene
-def calculate_parking_time_and_cost(entry_time_str, code, price_per_hour, price_per_day):
+# Funkcija za izračunavanje vremena parkiranja i cene (uzimajući u obzir praznike)
+def calculate_parking_time_and_cost(entry_time_str, code, price_per_hour, price_per_day, holidays):
     entry_time = datetime.strptime(entry_time_str, '%Y-%m-%d %H:%M:%S')
     current_time = datetime.now()
 
@@ -41,6 +42,15 @@ def calculate_parking_time_and_cost(entry_time_str, code, price_per_hour, price_
     # Prvo računamo dane, zatim sate
     days = hours // 24
 
+    # Pretvaranje praznika u datetime objekte za poređenje
+    holiday_dates = [datetime.strptime(date, '%Y-%m-%d').date() for date in holidays]
+
+    # Provera da li je parking obuhvatio praznični dan
+    for day_offset in range(int(days) + 1):
+        day_to_check = (entry_time + timedelta(days=day_offset)).date()
+        if day_to_check in holiday_dates:
+            return 0  # Parkiranje je besplatno na praznike
+
     # Računanje ukupne cene (sati ili dani)
     if days > 0:
         total_cost = days * price_per_day
@@ -48,6 +58,7 @@ def calculate_parking_time_and_cost(entry_time_str, code, price_per_hour, price_
         total_cost = hours * price_per_hour  # Za svaki započeti sat
 
     return total_cost
+
 
 # Funkcija za generisanje računa
 def generate_receipt(reg_oznaka, code, payment_method, total_cost):
@@ -108,9 +119,17 @@ def on_submit():
         messagebox.showerror("Greška", "Kod nije pronađen!")
         return
 
+    # Učitaj praznike iz administrativnih podataka
+    holidays = parking_administration.get("holidays", [])
+
     # Izračunaj cenu parkiranja
-    total_cost = calculate_parking_time_and_cost(entry_time_str, code, parking_administration["price_per_hour"],
-                                                 parking_administration["price_per_day"])
+    total_cost = calculate_parking_time_and_cost(
+        entry_time_str,
+        code,
+        parking_administration["price_per_hour"],
+        parking_administration["price_per_day"],
+        holidays
+    )
 
     # Prikazivanje prozora sa informacijama
     def on_payment(payment_method):
@@ -144,6 +163,7 @@ def on_submit():
 
     button_card = tk.Button(payment_window, text="Kartica", command=lambda: on_payment("Kartica"))
     button_card.pack(pady=5)
+
 
 # Glavni prozor za unos koda
 window = tk.Tk()
