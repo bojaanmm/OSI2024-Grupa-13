@@ -96,6 +96,20 @@ def handle_input():
         update_free_spots()
         entry.delete(0, tk.END)
 
+# Funkcija za ažuriranje prikaza cjenovnika
+def update_price_list():
+    data = load_parking_data()
+    price_per_hour = data.get("price_per_hour", 0)
+    price_per_day = data.get("price_per_day", 0)
+    label_price_list.config(text=f"Cijena po satu: {price_per_hour} KM\nCijena po danu: {price_per_day} KM")
+
+# Dodavanje oznake za prikaz cjenovnika
+label_price_list = tk.Label(root, text="", bg="#A9CFE8", justify="center")
+label_price_list.pack(pady=10)
+
+# Ažuriranje prikaza cjenovnika
+update_price_list()
+
 
 # Dodavanje labela za unos registarskih oznaka
 label = tk.Label(root, text="Unesite registarsku oznaku:", bg="#A9CFE8")

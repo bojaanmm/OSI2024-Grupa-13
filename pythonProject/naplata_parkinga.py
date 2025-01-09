@@ -147,8 +147,14 @@ def on_submit():
 
 # Glavni prozor za unos koda
 window = tk.Tk()
-window.title("Parking Sistem")
+window.title("Naplata Parkinga")
 window.geometry("300x150")  # Postavljanje minimalne veličine prozora
+
+# Promjena boje pozadine prozora na neutralno plavu
+window.config(bg="#A9CFE8")
+
+# Postavljanje ikone prozora
+window.iconphoto(False, tk.PhotoImage(file="parking.png"))
 
 label = tk.Label(window, text="Unesite kod:")
 label.pack(pady=10)
