@@ -179,6 +179,7 @@ window.iconphoto(False, tk.PhotoImage(file="parking.png"))
 label = tk.Label(window, text="Unesite kod:")
 label.pack(pady=10)
 
+# Polje za unos koda
 entry_code = tk.Entry(window)
 entry_code.pack(pady=10)
 
