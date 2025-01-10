@@ -84,10 +84,15 @@ def handle_input():
             json.dump(parked_vehicles, json_file, indent=4)
 
         # Kreiranje .txt fajla sa informacijama
-        with open(f"parking_ticket_{unique_code}.txt", "w") as txt_file:
+        with open(f"parking_ticket_{unique_code}.txt", "w", encoding="utf-8") as txt_file:
+            txt_file.write("Račun za parkiranje\n")
+            txt_file.write("=====================\n")
             txt_file.write(f"Registarska oznaka: {reg_oznaka}\n")
             txt_file.write(f"Vrijeme: {current_time}\n")
             txt_file.write(f"Jedinstveni kod: {unique_code}\n")
+            txt_file.write(f"Status: Nije plaćeno\n")
+            txt_file.write("=====================\n")
+            txt_file.write("Hvala na korištenju našeg sistema!\n")
 
         # Prikaz poruke o uspjehu
         messagebox.showinfo("Uspjeh", f"Unos registarskih oznaka '{reg_oznaka}' je uspješno zabilježen!")
