@@ -27,7 +27,6 @@ def update_parking_administration():
     with open('parking_administration.json', 'w') as f:
         json.dump(parking_administration, f, indent=4)
 
-# Funkcija za izračunavanje vremena parkiranja i cene
 # Funkcija za izračunavanje vremena parkiranja i cene (uzimajući u obzir praznike)
 def calculate_parking_time_and_cost(entry_time_str, code, price_per_hour, price_per_day, holidays):
     entry_time = datetime.strptime(entry_time_str, '%Y-%m-%d %H:%M:%S')
@@ -69,35 +68,35 @@ def generate_receipt(reg_oznaka, code, payment_method, total_cost):
         file.write(f"Ukupno plaćeno: {total_cost} KM\n")
         file.write(f"Način plačanja: {payment_method}\n")
 
-# Funkcija za upisivanje transakcije u mjesecni izvještaj
-def update_monthly_report(total_cost):
+# Funkcija za upisivanje transakcije u ukupni izvještaj
+def update_report(total_cost, reg_oznaka, code, payment_method):
     today = datetime.now()
-    one_month_ago = today - timedelta(days=30)
 
     # Pročitaj postojeći izvještaj
     try:
-        with open('mjesecni_izvjestaj.json', 'r') as f:
-            monthly_report = json.load(f)
+        with open('izvjestaj.json', 'r') as f:
+            report = json.load(f)
     except FileNotFoundError:
-        monthly_report = {"total_revenue": 0, "total_vehicles": 0, "transactions": []}
+        report = {"total_revenue": 0, "total_vehicles": 0, "transactions": []}
 
     # Dodaj novu transakciju
     transaction = {
         "date": today.strftime('%Y-%m-%d %H:%M:%S'),
-        "revenue": total_cost
+        "revenue": total_cost,
+        "reg_oznaka": reg_oznaka,
+        "code": code,
+        "payment_method": payment_method
     }
-    monthly_report["transactions"].append(transaction)
+    report["transactions"].append(transaction)
 
     # Ažuriraj ukupni prihod i broj vozila
-    monthly_report["total_revenue"] += total_cost
-    monthly_report["total_vehicles"] += 1
-
-    # Očisti stare transakcije (koje su starije od mesec dana)
-    monthly_report["transactions"] = [t for t in monthly_report["transactions"] if datetime.strptime(t["date"], '%Y-%m-%d %H:%M:%S') > one_month_ago]
+    report["total_revenue"] += total_cost
+    report["total_vehicles"] += 1
 
     # Upisivanje ažuriranog izvještaja
-    with open('mjesecni_izvjestaj.json', 'w') as f:
-        json.dump(monthly_report, f, indent=4)
+    with open('izvjestaj.json', 'w') as f:
+        json.dump(report, f, indent=4)
+
 
 # GUI za unos koda i plaćanje
 def on_submit():
@@ -140,8 +139,8 @@ def on_submit():
         remove_vehicle_from_parking_data(code)
         update_parking_administration()
 
-        # Ažuriraj mesečni izveštaj
-        update_monthly_report(total_cost)
+        # Ažuriraj ukupni izvještaj
+        update_report(total_cost, reg_oznaka, code, payment_method)
 
         # Zatvori prozor za plaćanje
         payment_window.destroy()
