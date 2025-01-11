@@ -61,12 +61,19 @@ def calculate_parking_time_and_cost(entry_time_str, code, price_per_hour, price_
 
 # Funkcija za generisanje računa
 def generate_receipt(reg_oznaka, code, payment_method, total_cost):
-    receipt_filename = f"receipt_{code}.txt"  # Korišćenje koda za naziv fajla
+    receipt_filename = f"parking_ticket_{code}.txt"
     with open(receipt_filename, "w", encoding="utf-8") as file:
-        file.write(f"Reg. Oznaka: {reg_oznaka}\n")
-        file.write(f"Plaćeno putem koda: {code}\n")  # Dodato ispod reg. oznake
+        # Kreiranje sadržaja računa u tekstualnom obliku
+        file.write("Račun za parkiranje\n")
+        file.write("=====================\n")
+        file.write(f"Registarska oznaka: {reg_oznaka}\n")
+        file.write(f"Vrijeme: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+        file.write(f"Jedinstveni kod: {code}\n")
         file.write(f"Ukupno plaćeno: {total_cost} KM\n")
-        file.write(f"Način plačanja: {payment_method}\n")
+        file.write(f"Način plaćanja: {payment_method}\n")
+        file.write(f"Status: Plaćeno\n")
+        file.write("=====================\n")
+        file.write("Hvala na korištenju našeg sistema!\n")
 
 # Funkcija za upisivanje transakcije u ukupni izvještaj
 def update_report(total_cost, reg_oznaka, code, payment_method):
