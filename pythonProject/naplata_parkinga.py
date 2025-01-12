@@ -20,13 +20,6 @@ def remove_vehicle_from_parking_data(code):
     with open('parking_data.json', 'w') as f:
         json.dump(parking_data, f, indent=4)
 
-# Funkcija za ažuriranje broja zauzetih mesta u parking_administration.json
-def update_parking_administration():
-    parking_administration = load_parking_administration()
-    parking_administration["occupied_spots"] -= 1
-    with open('parking_administration.json', 'w') as f:
-        json.dump(parking_administration, f, indent=4)
-
 # Funkcija za izračunavanje vremena parkiranja i cene (uzimajući u obzir praznike)
 def calculate_parking_time_and_cost(entry_time_str, code, price_per_hour, price_per_day, holidays):
     entry_time = datetime.strptime(entry_time_str, '%Y-%m-%d %H:%M:%S')
@@ -144,7 +137,6 @@ def on_submit():
 
         # Ažuriranje podataka nakon plaćanja
         remove_vehicle_from_parking_data(code)
-        update_parking_administration()
 
         # Ažuriraj ukupni izvještaj
         update_report(total_cost, reg_oznaka, code, payment_method)

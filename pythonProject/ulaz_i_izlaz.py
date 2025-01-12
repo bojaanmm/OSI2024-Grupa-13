@@ -101,7 +101,6 @@ def handle_input():
         update_free_spots()
         entry.delete(0, tk.END)
 
-
 # Funkcija za provjeru statusa izlaza
 def handle_exit():
     reg_oznaka = exit.get()
@@ -144,8 +143,41 @@ def handle_exit():
         else:
             messagebox.showwarning("Upozorenje", f"Vozilo s registarskom oznakom '{reg_oznaka}' nije platilo parking!")
     else:
-        messagebox.showwarning("Upozorenje",
-                               f"Nema transakcija za registarsku oznaku '{reg_oznaka}' u posljednjih 15 minuta.")
+        # Ako je vrijeme od 15 minuta isteklo, tretirati kao novi ulaz
+        data = load_parking_data()
+        if data["occupied_spots"] >= data["total_parking_spots"]:
+            messagebox.showwarning("Upozorenje", "Nema slobodnih mjesta za ponovni ulaz!")
+            exit.delete(0, tk.END)
+            return
+
+        current_time = now.strftime("%Y-%m-%d %H:%M:%S")
+        unique_code = generate_unique_code()
+        parking_record = {"reg_oznaka": reg_oznaka, "vrijeme": current_time, "kod": unique_code}
+
+        # Dodavanje zauzetog mjesta
+        data["occupied_spots"] += 1
+        save_parking_data(data)
+
+        # Dodavanje nove evidencije u parking_data.json
+        try:
+            with open("parking_data.json", "r") as json_file:
+                parked_vehicles = json.load(json_file)
+        except (FileNotFoundError, json.JSONDecodeError):
+            parked_vehicles = []
+
+        parked_vehicles.append(parking_record)
+
+        with open("parking_data.json", "w") as json_file:
+            json.dump(parked_vehicles, json_file, indent=4)
+
+        # Poruka korisniku
+        messagebox.showinfo("Obavijest",
+                            f"Vozilo s registarskom oznakom '{reg_oznaka}' tretirano je kao novi ulaz na parking.")
+
+        print(f"Unesena registarska oznaka: {reg_oznaka}, Vrijeme: {current_time}, Kod: {unique_code}")
+        update_free_spots()
+        exit.delete(0, tk.END)
+
 
 # Funkcija za ažuriranje prikaza cjenovnika
 def update_price_list():
