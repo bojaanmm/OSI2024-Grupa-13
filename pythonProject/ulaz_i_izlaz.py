@@ -101,6 +101,52 @@ def handle_input():
         update_free_spots()
         entry.delete(0, tk.END)
 
+
+# Funkcija za provjeru statusa izlaza
+def handle_exit():
+    reg_oznaka = exit.get()
+    if not reg_oznaka:
+        messagebox.showwarning("Upozorenje", "Molimo unesite registarsku oznaku za izlaz!")
+        return
+
+    try:
+        # Učitavanje izvještaja
+        with open("izvjestaj.json", "r") as file:
+            report_data = json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        messagebox.showerror("Greška", "Fajl 'izvjestaj.json' nije pronađen ili je oštećen.")
+        return
+
+    # Trenutno vrijeme
+    now = datetime.now()
+
+    # Filtriranje transakcija unutar posljednjih 15 minuta
+    recent_transactions = [
+        transaction for transaction in report_data.get("transactions", [])
+        if transaction["reg_oznaka"] == reg_oznaka and
+           now - datetime.strptime(transaction["date"], "%Y-%m-%d %H:%M:%S") <= timedelta(minutes=15)
+    ]
+
+    if recent_transactions:
+        # Provjeravanje plaćanja
+        if any(tx["revenue"] > 0 for tx in recent_transactions):
+            messagebox.showinfo("Uspjeh",
+                                f"Vozilo s registarskom oznakom '{reg_oznaka}' je platilo parking. Možete izaći.")
+
+            # Oslobađanje zauzetog mjesta
+            data = load_parking_data()
+            if data["occupied_spots"] > 0:
+                data["occupied_spots"] -= 1
+                save_parking_data(data)
+                update_free_spots()
+
+            exit.delete(0, tk.END)
+        else:
+            messagebox.showwarning("Upozorenje", f"Vozilo s registarskom oznakom '{reg_oznaka}' nije platilo parking!")
+    else:
+        messagebox.showwarning("Upozorenje",
+                               f"Nema transakcija za registarsku oznaku '{reg_oznaka}' u posljednjih 15 minuta.")
+
 # Funkcija za ažuriranje prikaza cjenovnika
 def update_price_list():
     data = load_parking_data()
@@ -117,16 +163,27 @@ update_price_list()
 
 
 # Dodavanje labela za unos registarskih oznaka
-label = tk.Label(root, text="Unesite registarsku oznaku:", bg="#A9CFE8")
-label.pack(pady=10)
+label = tk.Label(root, text="Unesite registarsku oznaku za ulaz:", bg="#A9CFE8")
+label.pack(pady=5)
 
 # Polje za unos registarskih oznaka
 entry = tk.Entry(root, width=30)
-entry.pack(pady=10)
+entry.pack(pady=5)
 
 # Dugme za potvrdu
-button = tk.Button(root, text="Potvrdi", command=handle_input)
-button.pack(pady=10)
+button = tk.Button(root, text="Ulaz", command=handle_input)
+button.pack(pady=5)
+
+label = tk.Label(root, text="Unesite registarsku oznaku za izlaz:", bg="#A9CFE8")
+label.pack(pady=5)
+
+# Polje za unos registarskih oznaka
+exit = tk.Entry(root, width=30)
+exit.pack(pady=5)
+
+# Dugme za potvrdu
+buttonExit = tk.Button(root, text="Izlaz", command=handle_exit)
+buttonExit.pack(pady=5)
 
 # Oznaka za prikaz slobodnih mjesta
 label_free_spots = tk.Label(root, text="Slobodna mjesta: 0", bg="#A9CFE8")
