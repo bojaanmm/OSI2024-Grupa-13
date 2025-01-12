@@ -74,6 +74,32 @@ def remove_holiday():
 def update_holiday_list():
     holidays_text.set("\n".join(selected_holidays))
 
+# Funkcija za prikaz podataka o parkiranim vozilima u novom prozoru
+def show_parked_vehicles_window():
+    # Kreiramo novi prozor
+    vehicles_window = tk.Toplevel(root)
+    vehicles_window.title("Parkirana vozila")
+    vehicles_window.geometry("500x400")
+
+    try:
+        # Učitavamo podatke o parkiranim vozilima
+        with open("parking_data.json", "r") as f:
+            parked_vehicles = json.load(f)
+
+        if parked_vehicles:
+            vehicles_text = "Parkirana vozila:\n"
+            for vehicle in parked_vehicles:
+                vehicles_text += f"Reg. oznaka: {vehicle['reg_oznaka']}, Vrijeme: {vehicle['vrijeme']}, Kod: {vehicle['kod']}\n"
+        else:
+            vehicles_text = "Nema parkiranih vozila."
+
+        # Labela za prikazivanje podataka
+        vehicles_label = tk.Label(vehicles_window, text=vehicles_text, justify="left", width=60, height=10)
+        vehicles_label.pack(pady=20)
+    except FileNotFoundError:
+        messagebox.showerror("Greška", "Fajl parking_data.json nije pronađen!")
+
+
 
 # Funkcija za filtriranje transakcija za poslednjih 24h
 def get_transactions_last_24_hours():
@@ -269,6 +295,9 @@ tk.Button(root, text="Ukloni praznik", command=remove_holiday).pack(pady=5)
 holidays_text = tk.StringVar()
 holidays_label = tk.Label(root, textvariable=holidays_text, bg="#A9CFE8")
 holidays_label.pack(pady=10)
+
+# Sekcija za prikaz parkiranih vozila
+tk.Button(root, text="Prikaz parkiranih vozila", command=show_parked_vehicles_window).pack(pady=10)
 
 # Sekcija za pristup izveštajima
 frame_password = tk.Frame(root, bg="#A9CFE8")
