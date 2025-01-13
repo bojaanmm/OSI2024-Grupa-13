@@ -53,6 +53,18 @@ def update_free_spots():
 def handle_input():
     reg_oznaka = entry.get()
     if reg_oznaka:
+        # Provjera da li je registarska oznaka VIP korisnik
+        try:
+            with open("vip_users.json", "r") as vip_file:
+                vip_users = json.load(vip_file)
+        except (FileNotFoundError, json.JSONDecodeError):
+            vip_users = []
+
+        if reg_oznaka in vip_users:
+            messagebox.showinfo("VIP Korisnik", f"Registarska oznaka '{reg_oznaka}' je VIP korisnik. Dobrodošli!")
+            entry.delete(0, tk.END)
+            return
+
         # Učitavanje postojećih podataka
         data = load_parking_data()
 
@@ -116,6 +128,24 @@ def handle_exit():
         messagebox.showerror("Greška", "Fajl 'izvjestaj.json' nije pronađen ili je oštećen.")
         return
 
+    # Provjera da li je registarska oznaka VIP korisnik
+    try:
+        with open("vip_users.json", "r") as vip_file:
+            vip_users = json.load(vip_file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        vip_users = []
+
+    if reg_oznaka in vip_users:
+        messagebox.showinfo("VIP Korisnik", f"Vozilo s registarskom oznakom '{reg_oznaka}' je VIP korisnik. Hvala na korištenju naših usluga, doviđenja!")
+        # Oslobađanje zauzetog mjesta
+        data = load_parking_data()
+        if data["occupied_spots"] > 0:
+            data["occupied_spots"] -= 1
+            save_parking_data(data)
+            update_free_spots()
+        exit.delete(0, tk.END)
+        return
+
     # Trenutno vrijeme
     now = datetime.now()
 
@@ -177,7 +207,6 @@ def handle_exit():
         print(f"Unesena registarska oznaka: {reg_oznaka}, Vrijeme: {current_time}, Kod: {unique_code}")
         update_free_spots()
         exit.delete(0, tk.END)
-
 
 # Funkcija za ažuriranje prikaza cjenovnika
 def update_price_list():

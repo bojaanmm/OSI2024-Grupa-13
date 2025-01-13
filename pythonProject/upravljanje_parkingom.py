@@ -268,6 +268,99 @@ def open_tariff_window():
         messagebox.showerror("Greška", "Neispravna lozinka!")
 
 
+def vip_users():
+    vip_window = tk.Toplevel(root)
+    vip_window.title("VIP korisnici")
+    vip_window.geometry("300x300")
+
+    # Kreiranje okvira za unos podataka
+    frame_vip = tk.Frame(vip_window)
+    frame_vip.pack(pady=10, padx=10)
+
+    # Dodavanje oznake iznad polja za unos
+    tk.Label(frame_vip, text="Unesite registarske oznake VIP korisnika:").pack(pady=5)
+    entry_vip = tk.Entry(frame_vip)
+    entry_vip.pack(pady=5)
+
+    # Kreiranje okvira za dugmad
+    frame_buttons = tk.Frame(vip_window)
+    frame_buttons.pack(pady=10)
+
+    # Funkcija za osvežavanje ispisa VIP korisnika
+    def refresh_vip_list():
+        try:
+            with open("vip_users.json", "r") as file:
+                vip_data = json.load(file)
+        except (FileNotFoundError, json.JSONDecodeError):
+            vip_data = []
+
+        # Osvježavanje liste
+        vip_list.delete(0, tk.END)
+        for oznaka in vip_data:
+            vip_list.insert(tk.END, oznaka)
+
+    # Funkcija za dodavanje VIP korisnika
+    def save_vip():
+        vip_oznaka = entry_vip.get()
+        if vip_oznaka:
+            try:
+                with open("vip_users.json", "r") as file:
+                    vip_data = json.load(file)
+            except (FileNotFoundError, json.JSONDecodeError):
+                vip_data = []
+
+            if vip_oznaka not in vip_data:
+                vip_data.append(vip_oznaka)
+                with open("vip_users.json", "w") as file:
+                    json.dump(vip_data, file, indent=4)
+                messagebox.showinfo("Uspjeh", f"Registarska oznaka '{vip_oznaka}' dodana u VIP listu.")
+            else:
+                messagebox.showwarning("Upozorenje", f"Registarska oznaka '{vip_oznaka}' već postoji u VIP listi.")
+        else:
+            messagebox.showerror("Greška", "Molimo unesite validnu registarsku oznaku!")
+        entry_vip.delete(0, tk.END)
+        refresh_vip_list()
+
+    # Funkcija za uklanjanje VIP korisnika
+    def remove_vip():
+        vip_oznaka = entry_vip.get()
+        if vip_oznaka:
+            try:
+                with open("vip_users.json", "r") as file:
+                    vip_data = json.load(file)
+            except (FileNotFoundError, json.JSONDecodeError):
+                messagebox.showerror("Greška", "Fajl 'vip_users.json' nije pronađen ili je oštećen.")
+                return
+
+            if vip_oznaka in vip_data:
+                vip_data.remove(vip_oznaka)
+                with open("vip_users.json", "w") as file:
+                    json.dump(vip_data, file, indent=4)
+                messagebox.showinfo("Uspjeh", f"Registarska oznaka '{vip_oznaka}' uklonjena iz VIP liste.")
+            else:
+                messagebox.showwarning("Upozorenje", f"Registarska oznaka '{vip_oznaka}' nije pronađena u VIP listi.")
+        else:
+            messagebox.showerror("Greška", "Molimo unesite validnu registarsku oznaku!")
+        entry_vip.delete(0, tk.END)
+        refresh_vip_list()
+
+    # Dodavanje dugmadi za dodavanje i uklanjanje VIP korisnika
+    tk.Button(frame_buttons, text="Dodaj", command=save_vip, width=10).pack(side="left", padx=5)
+    tk.Button(frame_buttons, text="Ukloni", command=remove_vip, width=10).pack(side="left", padx=5)
+
+    # Kreiranje okvira za ispis VIP korisnika
+    frame_vip_list = tk.Frame(vip_window)
+    frame_vip_list.pack(pady=10, padx=10)
+    tk.Label(frame_vip_list, text="VIP korisnici:").pack(anchor="w")
+
+    # Lista za prikaz VIP korisnika
+    vip_list = tk.Listbox(frame_vip_list, height=8, width=30)
+    vip_list.pack()
+
+    # Osvežavanje liste pri otvaranju prozora
+    refresh_vip_list()
+
+
 root = tk.Tk()
 root.title("Sistem za naplatu parkinga")
 root.geometry("600x750")
@@ -330,5 +423,8 @@ tk.Button(frame_password, text="Potvrdi", command=open_tariff_window).pack(side=
 
 # Dugme za prikaz parkiranih vozila
 tk.Button(root, text="Prikaz parkiranih vozila", command=show_parked_vehicles_window).pack(pady=10)
+
+# Dugme za dodavanje i uklanjanje VIP korisnika
+tk.Button(root, text="VIP korisnici", command=vip_users).pack(pady=5)
 
 root.mainloop()
