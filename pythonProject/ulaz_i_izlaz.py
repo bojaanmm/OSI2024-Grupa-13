@@ -2,7 +2,7 @@ import tkinter as tk
 import json
 import random
 import string
-from datetime import datetime
+from datetime import datetime, timedelta
 from tkinter import messagebox
 
 # Kreiranje glavnog prozora
