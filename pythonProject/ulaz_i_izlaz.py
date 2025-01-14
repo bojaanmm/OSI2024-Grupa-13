@@ -61,7 +61,7 @@ def handle_input():
             vip_users = []
 
         if reg_oznaka in vip_users:
-            messagebox.showinfo("VIP Korisnik", f"Registarska oznaka '{reg_oznaka}' je VIP korisnik. Dobrodošli!")
+            messagebox.showinfo("VIP Korisnik", f"Hvala na korištenju naših VIP usluga. Dobrodošli!")
             entry.delete(0, tk.END)
             return
 
@@ -136,7 +136,7 @@ def handle_exit():
         vip_users = []
 
     if reg_oznaka in vip_users:
-        messagebox.showinfo("VIP Korisnik", f"Vozilo s registarskom oznakom '{reg_oznaka}' je VIP korisnik. Hvala na korištenju naših usluga, doviđenja!")
+        messagebox.showinfo("VIP Korisnik", f"Hvala na korištenju naših VIP usluga, doviđenja!")
         # Oslobađanje zauzetog mjesta
         data = load_parking_data()
         if data["occupied_spots"] > 0:
@@ -160,7 +160,7 @@ def handle_exit():
         # Provjeravanje plaćanja
         if any(tx["revenue"] > 0 for tx in recent_transactions):
             messagebox.showinfo("Uspjeh",
-                                f"Vozilo s registarskom oznakom '{reg_oznaka}' je platilo parking. Možete izaći.")
+                                f"Parking za vozilo registarskih oznaka '{reg_oznaka}' je plaćen. Možete izaći.")
 
             # Oslobađanje zauzetog mjesta
             data = load_parking_data()
@@ -171,7 +171,7 @@ def handle_exit():
 
             exit.delete(0, tk.END)
         else:
-            messagebox.showwarning("Upozorenje", f"Vozilo s registarskom oznakom '{reg_oznaka}' nije platilo parking!")
+            messagebox.showwarning("Upozorenje", f"Parking za vozilo registarskih oznaka '{reg_oznaka}' nije plaćen!")
     else:
         # Ako je vrijeme od 15 minuta isteklo, tretirati kao novi ulaz
         data = load_parking_data()
